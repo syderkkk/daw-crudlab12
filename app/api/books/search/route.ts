@@ -24,7 +24,6 @@ export async function GET(request: NextRequest) {
   const orderParam = sp.get("order") || "desc";
   const order = orderParam === "asc" ? "asc" : "desc";
 
-  // Build dynamic AND conditions
   const conditions: Prisma.BookWhereInput[] = [];
 
   if (search) {
@@ -42,7 +41,7 @@ export async function GET(request: NextRequest) {
   const where: Prisma.BookWhereInput = conditions.length > 0 ? { AND: conditions } : {};
 
   try {
-    const [books, total] = await Promise.all([
+    const [data, total] = await Promise.all([
       prisma.book.findMany({
         where,
         include: { author: true },
@@ -53,15 +52,18 @@ export async function GET(request: NextRequest) {
       prisma.book.count({ where }),
     ]);
 
-    const pages = Math.ceil(total / limit);
+    const totalPages = Math.ceil(total / limit);
 
     return NextResponse.json({
-      books,
-      total,
-      pages,
-      page,
-      hasNextPage: page < pages,
-      hasPrevPage: page > 1,
+      data,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
     });
   } catch (err) {
     console.error("Book search error:", err);

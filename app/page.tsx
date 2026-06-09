@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { Nav } from "@/app/components/nav";
 import { StatCard } from "@/app/components/stat-card";
-import { PlusIcon, TrashIcon, UsersIcon } from "@/app/components/icons";
+import { PlusIcon, TrashIcon, UsersIcon, PencilIcon } from "@/app/components/icons";
 
 export const dynamic = "force-dynamic";
 
@@ -78,16 +78,25 @@ export default async function PaginaPrincipal() {
                           {autor.name.charAt(0)}
                         </span>
                       </div>
-                      <form action={eliminarAutor}>
-                        <input type="hidden" name="id" value={autor.id} />
-                        <button
-                          type="submit"
-                          title="Eliminar autor"
-                          className="rounded-xl p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 active:scale-[0.97] transition-all duration-150 opacity-0 group-hover:opacity-100"
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                        <Link
+                          href={`/authors/${autor.id}`}
+                          title="Editar autor"
+                          className="rounded-xl p-1.5 text-slate-300 hover:text-indigo-500 hover:bg-indigo-50 active:scale-[0.97] transition-all duration-150"
                         >
-                          <TrashIcon className="w-3.5 h-3.5" />
-                        </button>
-                      </form>
+                          <PencilIcon className="w-3.5 h-3.5" />
+                        </Link>
+                        <form action={eliminarAutor}>
+                          <input type="hidden" name="id" value={autor.id} />
+                          <button
+                            type="submit"
+                            title="Eliminar autor"
+                            className="rounded-xl p-1.5 text-slate-300 hover:text-rose-500 hover:bg-rose-50 active:scale-[0.97] transition-all duration-150"
+                          >
+                            <TrashIcon className="w-3.5 h-3.5" />
+                          </button>
+                        </form>
+                      </div>
                     </div>
 
                     <div className="flex-1 min-w-0">

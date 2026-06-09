@@ -1,6 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { computeAuthorStats } from "@/lib/author-stats";
 import { Nav } from "@/app/components/nav";
 import { PlusIcon, TrashIcon, ChartBarIcon } from "@/app/components/icons";
 
@@ -56,12 +57,7 @@ export default async function PaginaAutor({
   if (!autor) notFound();
 
   const libros = autor.books;
-  const total = libros.length;
-  const anios = libros.map((b) => b.publishedYear);
-  const promPaginas = total > 0 ? Math.round(libros.reduce((s, b) => s + b.pages, 0) / total) : 0;
-  const generos = [...new Set(libros.map((b) => b.genre))];
-  const masLargo = total > 0 ? libros.reduce((a, b) => (a.pages >= b.pages ? a : b)) : null;
-  const masCorto = total > 0 ? libros.reduce((a, b) => (a.pages <= b.pages ? a : b)) : null;
+  const stats = computeAuthorStats(autor, libros);
 
   return (
     <div className="min-h-screen">
@@ -81,11 +77,11 @@ export default async function PaginaAutor({
               )}
               <div className="flex items-center gap-4 mt-3">
                 <span className="text-xs font-medium text-slate-400">
-                  <span className="text-slate-700 font-semibold">{total}</span> {total === 1 ? "libro" : "libros"}
+                  <span className="text-slate-700 font-semibold">{stats.totalBooks}</span> {stats.totalBooks === 1 ? "libro" : "libros"}
                 </span>
-                {generos.length > 0 && (
+                {stats.genres.length > 0 && (
                   <span className="text-xs font-medium text-slate-400">
-                    <span className="text-slate-700 font-semibold">{generos.length}</span> {generos.length === 1 ? "género" : "géneros"}
+                    <span className="text-slate-700 font-semibold">{stats.genres.length}</span> {stats.genres.length === 1 ? "género" : "géneros"}
                   </span>
                 )}
               </div>
@@ -97,7 +93,7 @@ export default async function PaginaAutor({
 
           <aside className="lg:sticky lg:top-20 space-y-4">
 
-            {total > 0 && (
+            {stats.totalBooks > 0 && (
               <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 space-y-4">
                 <h2 className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                   <ChartBarIcon className="w-3.5 h-3.5" />
@@ -106,10 +102,10 @@ export default async function PaginaAutor({
 
                 <div className="grid grid-cols-2 gap-2">
                   {[
-                    { label: "Libros", value: total },
-                    { label: "Pág. prom.", value: promPaginas },
-                    { label: "Primer año", value: Math.min(...anios) },
-                    { label: "Último año", value: Math.max(...anios) },
+                    { label: "Libros", value: stats.totalBooks },
+                    { label: "Pág. prom.", value: stats.averagePages },
+                    { label: "Primer año", value: stats.firstBook?.year ?? "—" },
+                    { label: "Último año", value: stats.latestBook?.year ?? "—" },
                   ].map(({ label, value }) => (
                     <div key={label} className="bg-slate-50 rounded-xl p-3 text-center">
                       <p className="text-xl font-bold text-slate-900 tabular-nums">{value}</p>
@@ -118,11 +114,11 @@ export default async function PaginaAutor({
                   ))}
                 </div>
 
-                {generos.length > 0 && (
+                {stats.genres.length > 0 && (
                   <div className="space-y-2">
                     <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Géneros</p>
                     <div className="flex flex-wrap gap-1.5">
-                      {generos.map((g) => (
+                      {stats.genres.map((g) => (
                         <span key={g} className="rounded-full bg-indigo-50 border border-indigo-100 px-2.5 py-1 text-xs font-medium text-indigo-700">
                           {g}
                         </span>
@@ -131,17 +127,17 @@ export default async function PaginaAutor({
                   </div>
                 )}
 
-                {masLargo && masCorto && total > 1 && (
+                {stats.longestBook && stats.shortestBook && stats.totalBooks > 1 && (
                   <div className="space-y-2 pt-1 border-t border-slate-50">
                     <div>
                       <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Más largo</p>
-                      <p className="text-sm font-medium text-slate-800 truncate">{masLargo.title}</p>
-                      <p className="text-xs text-slate-400">{masLargo.pages} páginas</p>
+                      <p className="text-sm font-medium text-slate-800 truncate">{stats.longestBook.title}</p>
+                      <p className="text-xs text-slate-400">{stats.longestBook.pages} páginas</p>
                     </div>
                     <div>
                       <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1">Más corto</p>
-                      <p className="text-sm font-medium text-slate-800 truncate">{masCorto.title}</p>
-                      <p className="text-xs text-slate-400">{masCorto.pages} páginas</p>
+                      <p className="text-sm font-medium text-slate-800 truncate">{stats.shortestBook.title}</p>
+                      <p className="text-xs text-slate-400">{stats.shortestBook.pages} páginas</p>
                     </div>
                   </div>
                 )}
@@ -218,7 +214,7 @@ export default async function PaginaAutor({
 
             <div className="space-y-3">
               <h2 className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">
-                Libros publicados · {total}
+                Libros publicados · {stats.totalBooks}
               </h2>
 
               {libros.length === 0 ? (
