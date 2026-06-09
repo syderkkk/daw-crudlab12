@@ -1,0 +1,284 @@
+{
+  "info": {
+    "name": "Biblioteca API",
+    "description": "Colección de endpoints para el sistema de gestión de biblioteca (daw-crudlab12). Ejecuta las peticiones en orden: primero crea un autor, luego usa su ID para el resto.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "authorId",
+      "value": "",
+      "description": "Rellena con el ID devuelto al crear un autor",
+      "type": "string"
+    },
+    {
+      "key": "bookId",
+      "value": "",
+      "description": "Rellena con el ID devuelto al crear un libro",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Autores",
+      "item": [
+        {
+          "name": "GET Todos los autores",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/authors",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "authors"]
+            }
+          }
+        },
+        {
+          "name": "GET Todos los autores (con libros)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/authors?includeBooks=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "authors"],
+              "query": [
+                {
+                  "key": "includeBooks",
+                  "value": "true"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST Crear autor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Gabriel García Márquez\",\n  \"bio\": \"Premio Nobel de Literatura 1982. Máximo exponente del realismo mágico.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/authors",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "authors"]
+            }
+          }
+        },
+        {
+          "name": "GET Autor por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/authors/{{authorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "authors", "{{authorId}}"]
+            }
+          }
+        },
+        {
+          "name": "GET Libros de un autor",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/authors/{{authorId}}/books",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "authors", "{{authorId}}", "books"]
+            }
+          }
+        },
+        {
+          "name": "GET Estadísticas de un autor",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/authors/{{authorId}}/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "authors", "{{authorId}}", "stats"]
+            }
+          }
+        },
+        {
+          "name": "PUT Actualizar autor",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Gabriel García Márquez\",\n  \"bio\": \"Autor de Cien años de soledad. Premio Nobel de Literatura 1982.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/authors/{{authorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "authors", "{{authorId}}"]
+            }
+          }
+        },
+        {
+          "name": "DELETE Eliminar autor",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/authors/{{authorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "authors", "{{authorId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Libros",
+      "item": [
+        {
+          "name": "GET Todos los libros",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/books",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "books"]
+            }
+          }
+        },
+        {
+          "name": "GET Libros filtrados por género",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/books?genre=Novela",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "books"],
+              "query": [
+                {
+                  "key": "genre",
+                  "value": "Novela"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET Búsqueda avanzada de libros",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/books/search?q=cien&genre=Novela&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "books", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "cien"
+                },
+                {
+                  "key": "genre",
+                  "value": "Novela"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST Crear libro",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Cien años de soledad\",\n  \"genre\": \"Realismo mágico\",\n  \"publishedYear\": 1967,\n  \"pages\": 471,\n  \"authorId\": \"{{authorId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/books",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "books"]
+            }
+          }
+        },
+        {
+          "name": "GET Libro por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/books/{{bookId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "books", "{{bookId}}"]
+            }
+          }
+        },
+        {
+          "name": "PUT Actualizar libro",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Cien años de soledad (Edición revisada)\",\n  \"pages\": 480\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/books/{{bookId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "books", "{{bookId}}"]
+            }
+          }
+        },
+        {
+          "name": "DELETE Eliminar libro",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/books/{{bookId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "books", "{{bookId}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
